@@ -6,21 +6,42 @@ import {
   useLocation,
   matchPath,
 } from "react-router-dom";
-import Header from "@/components/header/header.jsx";
-import Home from "@/pages/home.jsx";
+import UseAuthCheck from "@/hooks/UseAuthCheck";
+import Header from "@/components/header/Header.jsx";
+import Home from "@/pages/Home.jsx";
+import Login from "@/pages/Login.jsx";
 import UseScrollToTop from "@/hooks/UseScrollToTop.jsx";
+import ProtectedRoute from "@/components/ProtectedRoute.jsx";
+
+function AppLayout() {
+  const location = useLocation();
+  const hideHeader = matchPath("/login", location.pathname);
+
+  UseAuthCheck(!hideHeader); 
+  
+  return (
+    <>
+      {!hideHeader && <Header />}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </>
+  );
+}
 
 export default function App() {
   return (
-    <div>
-      <Router>
-        <UseScrollToTop />
-        <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="about" element={<div>About</div>} />
-        </Routes>
-      </Router>
-    </div>
+    <Router>
+      <UseScrollToTop />
+      <AppLayout />
+    </Router>
   );
 }
