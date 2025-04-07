@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { PromptPresets } from "@/services/prompt";
 
 const initialState = {
   selectedPrompt: "Prompt All",
@@ -7,65 +8,7 @@ const initialState = {
   numberImages: 1,
   artisticLevel: 1,
   promptTexts: "",
-  promptPresets: [
-    {
-      category: "Photorealism",
-      presets: [
-        {
-          id: 1,
-          name: "Recraft V5 Raw",
-          image:
-            "https://img.recraft.ai/aOruMO9LZscq8HvJUYt-ataB0-9Uh_Lam0chUZv_Ups/rs:fit:512:512:0/q:95/g:no/plain/abs://prod/images/35b63e93-494f-4a92-b1ed-18f958d85cc2@jpg",
-          description: "ok",
-        },
-        {
-          id: 2,
-          name: "Recraft V7 Raw",
-          image:
-            "https://img.recraft.ai/aOruMO9LZscq8HvJUYt-ataB0-9Uh_Lam0chUZv_Ups/rs:fit:512:512:0/q:95/g:no/plain/abs://prod/images/35b63e93-494f-4a92-b1ed-18f958d85cc2@jpg",
-          description: "ok",
-        },
-      ],
-    },
-    {
-      category: "Photorealism1",
-      presets: [
-        {
-          id: 3,
-          name: "Recraft V3 Raw",
-          image:
-            "https://img.recraft.ai/aOruMO9LZscq8HvJUYt-ataB0-9Uh_Lam0chUZv_Ups/rs:fit:512:512:0/q:95/g:no/plain/abs://prod/images/35b63e93-494f-4a92-b1ed-18f958d85cc2@jpg",
-          description: "ok",
-        },
-        {
-          id: 4,
-          name: "Recraft V3 Raw",
-          image:
-            "https://img.recraft.ai/aOruMO9LZscq8HvJUYt-ataB0-9Uh_Lam0chUZv_Ups/rs:fit:512:512:0/q:95/g:no/plain/abs://prod/images/35b63e93-494f-4a92-b1ed-18f958d85cc2@jpg",
-          description: "ok",
-        },
-      ],
-    },
-    {
-      category: "Photorealism2",
-      presets: [
-        {
-          id: 5,
-          name: "Recraft V3 Raw",
-          image:
-            "https://img.recraft.ai/aOruMO9LZscq8HvJUYt-ataB0-9Uh_Lam0chUZv_Ups/rs:fit:512:512:0/q:95/g:no/plain/abs://prod/images/35b63e93-494f-4a92-b1ed-18f958d85cc2@jpg",
-          description: "ok",
-        },
-        {
-          id: 6,
-          name: "Recraft V3 Raw",
-          image:
-            "https://img.recraft.ai/aOruMO9LZscq8HvJUYt-ataB0-9Uh_Lam0chUZv_Ups/rs:fit:512:512:0/q:95/g:no/plain/abs://prod/images/35b63e93-494f-4a92-b1ed-18f958d85cc2@jpg",
-          description: "ok",
-        },
-      ],
-    },
-  ],
+  promptPresets: [],
   aspectRatios: [
     {
       id: 1,
@@ -191,6 +134,18 @@ export const generateImageFromPrompt = createAsyncThunk(
   }
 );
 
+export const fetchPromptPresets = createAsyncThunk(
+  'imagePrompt/fetchPromptPresets',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await PromptPresets();
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
 const imagePromptSlice = createSlice({
   name: "imagePrompt",
   initialState,
@@ -214,6 +169,11 @@ const imagePromptSlice = createSlice({
       state.promptTexts = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(fetchPromptPresets.fulfilled, (state, action) => {
+      state.promptPresets = action.payload;
+    });
+  }
 });
 
 export const {
